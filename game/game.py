@@ -1,5 +1,6 @@
 import arcade
 import random
+from sprites import SparseGrass
 
 SPRITE_SCALING = 0.5
 
@@ -35,7 +36,7 @@ class Priceless(arcade.Window):
         # Create horizontal rows of boxes
         for x in range(32, SCREEN_WIDTH, 64):
             # Bottom edge
-            wall = arcade.Sprite("assets/tiles.png", scale=4, image_width=16, image_height=16)
+            wall = SparseGrass()
             wall.center_x = x
             wall.center_y = 32
             self.wall_list.append(wall)
