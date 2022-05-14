@@ -1,15 +1,3 @@
-"""
-Sprite Simple Bouncing
-
-Simple program to show how to bounce items.
-This only works for straight vertical and horizontal angles.
-
-Artwork from https://kenney.nl
-
-If Python and Arcade are installed, this example can be run from the command line with:
-python -m arcade.examples.sprite_bouncing_coins
-"""
-
 import arcade
 import random
 
@@ -22,7 +10,7 @@ SCREEN_TITLE = "Sprite Bouncing Coins"
 MOVEMENT_SPEED = 5
 
 
-class MyGame(arcade.Window):
+class Priceless(arcade.Window):
     """ Main application class. """
 
     def __init__(self, width, height, title):
@@ -47,13 +35,13 @@ class MyGame(arcade.Window):
         # Create horizontal rows of boxes
         for x in range(32, SCREEN_WIDTH, 64):
             # Bottom edge
-            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+            wall = arcade.Sprite("assets/tiles.png", scale=4, image_width=16, image_height=16)
             wall.center_x = x
             wall.center_y = 32
             self.wall_list.append(wall)
 
             # Top edge
-            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+            wall = arcade.Sprite("assets/tiles.png", scale=4, image_x=0, image_y=16, image_width=16, image_height=16)
             wall.center_x = x
             wall.center_y = SCREEN_HEIGHT - 32
             self.wall_list.append(wall)
@@ -61,13 +49,13 @@ class MyGame(arcade.Window):
         # Create vertical columns of boxes
         for y in range(96, SCREEN_HEIGHT, 64):
             # Left
-            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+            wall = arcade.Sprite("assets/tiles.png", scale=4, image_x=0, image_y=16, image_width=16, image_height=16)
             wall.center_x = 32
             wall.center_y = y
             self.wall_list.append(wall)
 
             # Right
-            wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+            wall = arcade.Sprite("assets/tiles.png", scale=4, image_x=0, image_y=16, image_width=16, image_height=16)
             wall.center_x = SCREEN_WIDTH - 32
             wall.center_y = y
             self.wall_list.append(wall)
@@ -75,7 +63,7 @@ class MyGame(arcade.Window):
         # Create boxes in the middle
         for x in range(128, SCREEN_WIDTH, 196):
             for y in range(128, SCREEN_HEIGHT, 196):
-                wall = arcade.Sprite(":resources:images/tiles/boxCrate_double.png", SPRITE_SCALING)
+                wall = arcade.Sprite("assets/tiles.png", scale=4, image_x=0, image_y=16, image_width=16, image_height=16)
                 wall.center_x = x
                 wall.center_y = y
                 # wall.angle = 45
@@ -135,7 +123,7 @@ class MyGame(arcade.Window):
 
 def main():
     """ Main function """
-    window = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    window = Priceless(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
     window.setup()
     arcade.run()
 
