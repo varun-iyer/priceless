@@ -2,15 +2,6 @@ import arcade
 import random
 from sprites import SparseGrass
 
-SPRITE_SCALING = 0.5
-
-SCREEN_WIDTH = 832
-SCREEN_HEIGHT = 632
-SCREEN_TITLE = "Sprite Bouncing Coins"
-
-MOVEMENT_SPEED = 5
-
-
 class Priceless(arcade.Window):
     """ Main application class. """
 
@@ -21,65 +12,25 @@ class Priceless(arcade.Window):
         super().__init__(width, height, title)
 
         # Sprite lists
-        self.coin_list = None
-        self.wall_list = None
+        self.tile_list = None
+        self.figure_list = None
 
     def setup(self):
         """ Set up the game and initialize the variables. """
 
         # Sprite lists
-        self.wall_list = arcade.SpriteList()
-        self.coin_list = arcade.SpriteList()
+        self.tile_list = arcade.SpriteList()
+        self.figure_list = arcade.SpriteList()
 
-        # -- Set up the walls
-
-        # Create horizontal rows of boxes
-        for x in range(32, SCREEN_WIDTH, 64):
-            # Bottom edge
-            wall = SparseGrass()
-            wall.center_x = x
-            wall.center_y = 32
-            self.wall_list.append(wall)
-
-            # Top edge
-            wall = arcade.Sprite("assets/tiles.png", scale=4, image_x=0, image_y=16, image_width=16, image_height=16)
-            wall.center_x = x
-            wall.center_y = SCREEN_HEIGHT - 32
-            self.wall_list.append(wall)
-
-        # Create vertical columns of boxes
-        for y in range(96, SCREEN_HEIGHT, 64):
-            # Left
-            wall = arcade.Sprite("assets/tiles.png", scale=4, image_x=0, image_y=16, image_width=16, image_height=16)
-            wall.center_x = 32
-            wall.center_y = y
-            self.wall_list.append(wall)
-
-            # Right
-            wall = arcade.Sprite("assets/tiles.png", scale=4, image_x=0, image_y=16, image_width=16, image_height=16)
-            wall.center_x = SCREEN_WIDTH - 32
-            wall.center_y = y
-            self.wall_list.append(wall)
-
-        # Create boxes in the middle
-        for x in range(128, SCREEN_WIDTH, 196):
-            for y in range(128, SCREEN_HEIGHT, 196):
-                wall = arcade.Sprite("assets/tiles.png", scale=4, image_x=0, image_y=16, image_width=16, image_height=16)
-                wall.center_x = x
-                wall.center_y = y
-                # wall.angle = 45
-                self.wall_list.append(wall)
-
-        # Create coins
-        for i in range(10):
-            coin = arcade.Sprite(":resources:images/items/coinGold.png", 0.25)
-            coin.center_x = random.randrange(100, 700)
-            coin.center_y = random.randrange(100, 500)
-            while coin.change_x == 0 and coin.change_y == 0:
-                coin.change_x = random.randrange(-4, 5)
-                coin.change_y = random.randrange(-4, 5)
-
-            self.coin_list.append(coin)
+        # should use itertools but w/e
+        for x in range(0, 16 * 16, 16):
+            for y in range(0, 16 * 16, 16):
+                # choose tile from enum
+                tile = SparseGrass()
+                tile.center_x = x
+                tile.center_y = y
+                print(x, y)
+                self.tile_list.append(tile)
 
         # Set the background color
         arcade.set_background_color(arcade.color.AMAZON)
@@ -93,38 +44,17 @@ class Priceless(arcade.Window):
         self.clear()
 
         # Draw all the sprites.
-        self.wall_list.draw()
-        self.coin_list.draw()
+        self.tile_list.draw()
+        self.figure_list.draw()
 
     def on_update(self, delta_time):
         """ Movement and game logic """
-
-        for coin in self.coin_list:
-
-            coin.center_x += coin.change_x
-            walls_hit = arcade.check_for_collision_with_list(coin, self.wall_list)
-            for wall in walls_hit:
-                if coin.change_x > 0:
-                    coin.right = wall.left
-                elif coin.change_x < 0:
-                    coin.left = wall.right
-            if len(walls_hit) > 0:
-                coin.change_x *= -1
-
-            coin.center_y += coin.change_y
-            walls_hit = arcade.check_for_collision_with_list(coin, self.wall_list)
-            for wall in walls_hit:
-                if coin.change_y > 0:
-                    coin.top = wall.bottom
-                elif coin.change_y < 0:
-                    coin.bottom = wall.top
-            if len(walls_hit) > 0:
-                coin.change_y *= -1
+        pass
 
 
 def main():
     """ Main function """
-    window = Priceless(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+    window = Priceless(16 * 16, 16 * 16, "Priceless")
     window.setup()
     arcade.run()
 
