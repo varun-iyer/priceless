@@ -1,8 +1,11 @@
+from ast import Call
 from dataclasses import dataclass
 from enum import Enum
+from operator import truediv
 from tkinter import Scale
 from typing import Callable
 import arcade
+
 
 @dataclass
 class Resource:
@@ -10,15 +13,47 @@ class Resource:
     amount: int
     value: int
 
+    def collect(self) -> int:
+        if self.amount <= 0:
+            return 0
+        self.amount -= 10
+        return 10
+
 @dataclass
 class UpgradeRequirement:
     rock: int
     wood: int
     water: int
 
+
+@dataclass
+class CityManager:
+    totals = {
+        "wood": 0,
+        "water": 0,
+        "rock" : 0
+    }
+    levels = [
+        UpgradeRequirement(rock=500, wood=500, water=500),
+        UpgradeRequirement(rock=1500, wood=1000, water=1000),
+        UpgradeRequirement(rock=3000, wood=3000,  water=3000)
+    ]
+    current_level = -1
+    value = 0
+
+    def upgrade(self):
+        if self.current_level == 3:
+            return
+        next_upgrade = self.levels[self.current_level + 1]
+        if (self.totals["wood"] >= next_upgrade.wood and
+            self.totals["water"] >= next_upgrade.water and 
+            self.totals["rock"] >= next_upgrade.rock):
+            self.current_level += 1
+    
+
 class City(arcade.Sprite):
 
-    def __init__(self) -> None:
+    def __init__(self, city_manager) -> None:
         super().__init__(
             "assets/tiles.png", 
             image_y=3*16,  
@@ -27,26 +62,22 @@ class City(arcade.Sprite):
             image_height=16,
             scale = 1.0
         )
-        self.totals  = {
-            "wood": 0,
-            "water": 0,
-            "rock" : 0
-        }
-        self.levels = [
-            UpgradeRequirement(rock=500, wood=500, water=500),
-            UpgradeRequirement(rock=1500, wood=1000, water=1000),
-            UpgradeRequirement(rock=3000, wood=3000,  water=3000)
-        ]
-        self.current_level = 0
-        self.current_value = 0
+        self.city_manager = city_manager
+
+    def add_resource(self, resource: str, amount: int) -> None:
+        self.city_manager.totals[resource] += amount
+
+    def get_current_level(self):
+        return self.city_manager.current_level
+    
+    def get_totals(self):
+        return self.city_manager.totals
+
+    def get_city_value(self):
+        return self.city_manager.value
 
     def upgrade(self):
-        if self.current_level == 3:
-            return
-        if  (self.totals["wood"] >= self.levels[self.current_level].wood and
-             self.totals["water"] >= self.levels[self.current_level].water and
-             self.totals["rock"] >= self.levels[self.current_level].rock):
-             self.current_level += 1
+        self.city_manager.upgrade()
 
 
 
@@ -123,14 +154,14 @@ class Player(arcade.Sprite):
         if self.backpack["space"] <= 0:
             return 
         self.backpack["space"] -= 10
-        self.backpack[sprite.resource.name] += 10
-        sprite.resource.amount -= 10
+        amount = sprite.resource.collect()
+        self.backpack[sprite.resource.name] += amount
     
 
     def drop_off(self, city):
-        city.totals["wood"] += self.backpack["wood"]
-        city.totals["water"] += self.backpack["water"]
-        city.totals["rock"] += self.backpack["rock"]
+        city.add_resource("wood", self.backpack["wood"])
+        city.add_resource("water", self.backpack["water"])
+        city.add_resource("rock", self.backpack["rock"])
 
         self.backpack["wood"] = 0
         self.backpack["water"] = 0

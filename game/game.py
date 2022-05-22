@@ -1,8 +1,9 @@
 from tkinter.font import names
+from typing import Type
 import arcade
 import random
 import numpy as  np
-from sprites import SparseGrass, Mountain, Player, City, Tree, Water
+from sprites import SparseGrass, Mountain, Player, City, Tree, Water, CityManager
 
 PLAYER_MOVEMENT_SPEED = 6
 class CollectResourceView(arcade.View):
@@ -60,23 +61,22 @@ class Priceless(arcade.Window):
         resource_collision = self.check_collisions("Resources")
         if not resource_collision:
             return
-        collision = resource_collision.pop()
-        if isinstance(collision, City):
-            print(collision.current_level)
-            print(collision.totals)
-            self.player_sprite.drop_off(collision)
+        sprite = resource_collision.pop()
+        if isinstance(sprite, City):
+            print(sprite.get_current_level())
+            print(sprite.get_totals())
+            print(sprite.get_city_value())
+            self.player_sprite.drop_off(sprite)
         else:
-            print(collision.resource.name)
-            print(collision.resource.amount)
-            self.player_sprite.gather(collision)
-     
-        print(collision.resource.amount)
+            print(sprite.resource.name)
+            print(sprite.resource.amount)
+            self.player_sprite.gather(sprite)
+            print(sprite.resource.amount)
 
            
-    
     def check_collisions(self, resource):
         hit_list = arcade.check_for_collision_with_lists(
-            self.player_sprite, [self.scene[resource]]
+            self.player_sprite, [self.scene[resource], self.scene["City"]]
         )
         return hit_list 
 
@@ -91,7 +91,7 @@ class Priceless(arcade.Window):
         self.scene.add_sprite_list("City", use_spatial_hash=True)
 
         self.player_sprite = Player()
-        self.city_sprite = City()
+        self.city_manager = CityManager()
 
         for x in range(0, self.width-16, 16):
             for y in range(0, self.height-16, 16):
@@ -99,10 +99,10 @@ class Priceless(arcade.Window):
                 if (x == self.width//2) and (y == self.height//2):
                     scene_name = "Player"
                     tile = self.player_sprite
-                elif ((x == self.width//2 + 2) or (x == self.width//2 - 2) and
-                      (y == self.height//2 + 2) or (y == self.height//2 - 2)):
+                elif (((x == self.width//2 + 16) or (x == self.width//2 - 16)) and
+                      ((y == self.height//2 + 16) or (y == self.height//2 - 16))):
                       scene_name = "City"
-                      tile = self.city_sprite
+                      tile = City(self.city_manager)
                 elif self.make_resource(x/16, y/16): #tests
                     scene_name = "Resources"
                     tile = self.get_random_resource()()
