@@ -2,10 +2,47 @@ from tkinter.font import names
 from typing import Type
 import arcade
 import random
+import os
 import numpy as  np
 from sprites import SparseGrass, Mountain, Player, City, Tree, Water, CityManager
 
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 800
 PLAYER_MOVEMENT_SPEED = 6
+
+class MenuView(arcade.View):
+    def on_show_view(self):
+        arcade.set_background_color(arcade.color.BLACK)
+
+    def on_draw(self):
+        self.clear()
+        arcade.draw_text("GAME NAME PLACEHOLDER", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+                         arcade.color.WHITE, font_size=50, anchor_x="center")
+        arcade.draw_text("Click to learn how to play", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 75,
+                         arcade.color.GRAY, font_size=20, anchor_x="center")
+
+    def on_mouse_press(self, _x, _y, _button, _modifiers):
+        instructions_view = InstructionView()
+        self.window.show_view(instructions_view)
+
+class InstructionView(arcade.View):
+    def on_show_view(self):
+        arcade.set_background_color(arcade.color.ORANGE_PEEL)
+
+    def on_draw(self):
+        self.clear()
+        arcade.draw_text("How to Play", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+                         arcade.color.BLACK, font_size=50, anchor_x="center")
+        arcade.draw_text("Objective: ", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 75, 
+                        arcade.color.GRAY, font_size=20, anchor_x="center")
+        arcade.draw_text("Click to advance", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2.5 - 75,
+                         arcade.color.GRAY, font_size=20, anchor_x="center")
+
+    def on_mouse_press(self, _x, _y, _button, _modifiers):
+        game_view = Priceless(SCREEN_WIDTH, SCREEN_HEIGHT, "Priceless")
+        # window.setup()
+        self.window.show_view(game_view)
+
 class CollectResourceView(arcade.View):
     def on_draw(self):
         """Draw the game overview"""
@@ -21,17 +58,18 @@ class CollectResourceView(arcade.View):
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         """Use a mouse press to advance to the 'game' view."""
-        game_view = GameView()
+        game_view = Priceless()
         self.window.show_view(game_view)
 
-class Priceless(arcade.Window):
+class Priceless(arcade.View):
     """ Main application class. """
 
     def __init__(self, width, height, title):
         """
         Initializer
         """
-        super().__init__(width, height, title)
+        # super().__init__(width, height, title)
+        super().__init__()
 
         self.scene = None
         self.player_sprite = None
@@ -122,6 +160,9 @@ class Priceless(arcade.Window):
         # This command has to happen before we start drawing
         self.clear()
 
+        arcade.draw_text("Resources", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 75,
+                         arcade.color.GRAY, font_size=20, anchor_x="center")
+
         self.scene.draw()
 
     def on_key_press(self, key, modifiers):
@@ -159,8 +200,14 @@ class Priceless(arcade.Window):
 
 def main():
     """ Main function """
-    window = Priceless(800, 800, "Priceless")
-    window.setup()
+    # window = Priceless(800, 800, "Priceless")
+    # # arcade.open_window(500, 500, "Welcome to GFG", False, False)
+    # window.setup()
+
+    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Different Views Example")
+    window.total_score = 0
+    menu_view = MenuView()
+    window.show_view(menu_view)
     arcade.run()
 
 
