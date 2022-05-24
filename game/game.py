@@ -2,36 +2,75 @@ from tkinter.font import names
 from typing import Type
 import arcade
 import random
+import os
 import numpy as  np
 from sprites import SparseGrass, Mountain, Player, City, Tree, Water, CityManager
 
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 800
 PLAYER_MOVEMENT_SPEED = 6
-class CollectResourceView(arcade.View):
+
+class MenuView(arcade.View):
+    def on_show_view(self):
+        arcade.set_background_color(arcade.color.BLACK)
+
     def on_draw(self):
-        """Draw the game overview"""
         self.clear()
-        arcade.draw_text(
-            "Click to Collect!",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2,
-            arcade.color.WHITE,
-            30,
-            anchor_x="center",
-        )
+        arcade.draw_text("GAME NAME PLACEHOLDER", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+                         arcade.color.WHITE, font_size=50, anchor_x="center")
+        arcade.draw_text("Click to learn how to play", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 75,
+                         arcade.color.GRAY, font_size=20, anchor_x="center")
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
-        """Use a mouse press to advance to the 'game' view."""
-        game_view = GameView()
+        instructions_view = InstructionView()
+        self.window.show_view(instructions_view)
+
+class InstructionView(arcade.View):
+    def on_show_view(self):
+        arcade.set_background_color(arcade.color.ORANGE_PEEL)
+
+    def on_draw(self):
+        self.clear()
+        arcade.draw_text("How to Play", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+                         arcade.color.BLACK, font_size=50, anchor_x="center")
+        arcade.draw_text("Objective: ", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 75, 
+                        arcade.color.GRAY, font_size=20, anchor_x="center")
+        arcade.draw_text("Click to advance", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2.5 - 75,
+                         arcade.color.GRAY, font_size=20, anchor_x="center")
+
+    def on_mouse_press(self, _x, _y, _button, _modifiers):
+        game_view = Priceless()
+        game_view.setup()
+        # arcade.close_window()
         self.window.show_view(game_view)
 
-class Priceless(arcade.Window):
+# class CollectResourceView(arcade.View):
+#     def on_draw(self):
+#         """Draw the game overview"""
+#         self.clear()
+#         arcade.draw_text(
+#             "Click to Collect!",
+#             SCREEN_WIDTH / 2,
+#             SCREEN_HEIGHT / 2,
+#             arcade.color.WHITE,
+#             30,
+#             anchor_x="center",
+#         )
+
+#     def on_mouse_press(self, _x, _y, _button, _modifiers):
+#         """Use a mouse press to advance to the 'game' view."""
+#         game_view = Priceless()
+#         self.window.show_view(game_view)
+
+class Priceless(arcade.View):
     """ Main application class. """
 
-    def __init__(self, width, height, title):
+    def __init__(self):
         """
         Initializer
         """
-        super().__init__(width, height, title)
+        # super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, "Priceless")
+        super().__init__()
 
         self.scene = None
         self.player_sprite = None
@@ -93,14 +132,14 @@ class Priceless(arcade.Window):
         self.player_sprite = Player()
         self.city_manager = CityManager()
 
-        for x in range(0, self.width-16, 16):
-            for y in range(0, self.height-16, 16):
+        for x in range(0, SCREEN_WIDTH-16, 16):
+            for y in range(0, SCREEN_HEIGHT-16, 16):
                 # choose tile from enum
-                if (x == self.width//2) and (y == self.height//2):
+                if (x == SCREEN_WIDTH//2) and (y == SCREEN_HEIGHT//2):
                     scene_name = "Player"
                     tile = self.player_sprite
-                elif (((x == self.width//2 + 16) or (x == self.width//2 - 16)) and
-                      ((y == self.height//2 + 16) or (y == self.height//2 - 16))):
+                elif (((x == SCREEN_WIDTH//2 + 16) or (x == SCREEN_WIDTH//2 - 16)) and
+                      ((y == SCREEN_HEIGHT//2 + 16) or (y == SCREEN_HEIGHT//2 - 16))):
                       scene_name = "City"
                       tile = City(self.city_manager)
                 elif self.make_resource(x/16, y/16): #tests
@@ -121,6 +160,9 @@ class Priceless(arcade.Window):
 
         # This command has to happen before we start drawing
         self.clear()
+
+        arcade.draw_text("Resources", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 75,
+                         arcade.color.GRAY, font_size=20, anchor_x="center")
 
         self.scene.draw()
 
@@ -159,10 +201,16 @@ class Priceless(arcade.Window):
 
 def main():
     """ Main function """
-    window = Priceless(800, 800, "Priceless")
-    window.setup()
-    arcade.run()
+    # window = Priceless(800, 800, "Priceless")
+    # # arcade.open_window(500, 500, "Welcome to GFG", False, False)
+    # window.setup()
 
+    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Different Views Example")
+    window.total_score = 0
+    menu_view = MenuView()
+    window.show_view(menu_view)
+    arcade.run()
+    
 
 if __name__ == "__main__":
     main()
