@@ -39,36 +39,37 @@ class InstructionView(arcade.View):
                          arcade.color.GRAY, font_size=20, anchor_x="center")
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
-        game_view = Priceless(SCREEN_WIDTH, SCREEN_HEIGHT, "Priceless")
-        # window.setup()
-        self.window.show_view(game_view)
-
-class CollectResourceView(arcade.View):
-    def on_draw(self):
-        """Draw the game overview"""
-        self.clear()
-        arcade.draw_text(
-            "Click to Collect!",
-            SCREEN_WIDTH / 2,
-            SCREEN_HEIGHT / 2,
-            arcade.color.WHITE,
-            30,
-            anchor_x="center",
-        )
-
-    def on_mouse_press(self, _x, _y, _button, _modifiers):
-        """Use a mouse press to advance to the 'game' view."""
         game_view = Priceless()
+        game_view.setup()
+        # arcade.close_window()
         self.window.show_view(game_view)
+
+# class CollectResourceView(arcade.View):
+#     def on_draw(self):
+#         """Draw the game overview"""
+#         self.clear()
+#         arcade.draw_text(
+#             "Click to Collect!",
+#             SCREEN_WIDTH / 2,
+#             SCREEN_HEIGHT / 2,
+#             arcade.color.WHITE,
+#             30,
+#             anchor_x="center",
+#         )
+
+#     def on_mouse_press(self, _x, _y, _button, _modifiers):
+#         """Use a mouse press to advance to the 'game' view."""
+#         game_view = Priceless()
+#         self.window.show_view(game_view)
 
 class Priceless(arcade.View):
     """ Main application class. """
 
-    def __init__(self, width, height, title):
+    def __init__(self):
         """
         Initializer
         """
-        # super().__init__(width, height, title)
+        # super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, "Priceless")
         super().__init__()
 
         self.scene = None
@@ -131,14 +132,14 @@ class Priceless(arcade.View):
         self.player_sprite = Player()
         self.city_manager = CityManager()
 
-        for x in range(0, self.width-16, 16):
-            for y in range(0, self.height-16, 16):
+        for x in range(0, SCREEN_WIDTH-16, 16):
+            for y in range(0, SCREEN_HEIGHT-16, 16):
                 # choose tile from enum
-                if (x == self.width//2) and (y == self.height//2):
+                if (x == SCREEN_WIDTH//2) and (y == SCREEN_HEIGHT//2):
                     scene_name = "Player"
                     tile = self.player_sprite
-                elif (((x == self.width//2 + 16) or (x == self.width//2 - 16)) and
-                      ((y == self.height//2 + 16) or (y == self.height//2 - 16))):
+                elif (((x == SCREEN_WIDTH//2 + 16) or (x == SCREEN_WIDTH//2 - 16)) and
+                      ((y == SCREEN_HEIGHT//2 + 16) or (y == SCREEN_HEIGHT//2 - 16))):
                       scene_name = "City"
                       tile = City(self.city_manager)
                 elif self.make_resource(x/16, y/16): #tests
@@ -209,7 +210,7 @@ def main():
     menu_view = MenuView()
     window.show_view(menu_view)
     arcade.run()
-
+    
 
 if __name__ == "__main__":
     main()
