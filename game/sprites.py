@@ -6,6 +6,8 @@ from tkinter import Scale
 from typing import Callable
 import arcade
 
+from conf import SPRITE_SCALE
+
 
 @dataclass
 class Resource:
@@ -60,7 +62,7 @@ class City(arcade.Sprite):
             image_x=7*16,  
             image_width=16,
             image_height=16,
-            scale = 1.0
+            scale=SPRITE_SCALE
         )
         self.city_manager = city_manager
 
@@ -81,10 +83,14 @@ class City(arcade.Sprite):
 
 
 
-class SparseGrass(arcade.Sprite):
+class Grass(arcade.Sprite):
 
     def __init__(self):
-        super().__init__("assets/tiles.png", 1, image_y=16*8, image_x=0, image_width=16, image_height=16)
+        super().__init__("assets/tiles.png", image_y=16*8, image_x=0, image_width=16, image_height=16, scale=SPRITE_SCALE)
+        self.resource = Resource("grass", 0, 0)
+
+    def degrade(self):
+        pass
 
 
 class Mountain(arcade.Sprite):
@@ -93,26 +99,54 @@ class Mountain(arcade.Sprite):
         super().__init__(
             "assets/tiles.png", 
             image_y=7*16,  
-            image_x=6*16,  
+            image_x=7*16,  
             image_width=16,
             image_height=16,
-            scale = 1.0
+            scale=SPRITE_SCALE
         )
         self.resource = Resource("rock", amount=100, value=10)
-                
+        self.textures = [
+            arcade.load_texture("assets/tiles.png", x=7*16, y=7*16,width=16,height=16),
+            arcade.load_texture("assets/tiles.png", x=6*16, y=7*16,width=16,height=16),
+            arcade.load_texture("assets/tiles.png", x=0*16, y=9*16,width=16,height=16),
+        ]
+        self.texture_stage = 0
+
+    def degrade(self) -> None:
+        if self.resource.amount > 0:
+            self.resource = Resource("rock", amount=self.resource.amount/2, value=self.resource.value/2)
+            self.texture_stage += 1
+            if self.texture_stage >= len(self.textures):
+                self.texture_stage -= 1
+            self.texture = self.textures[self.texture_stage]
+             
 
 class Water(arcade.Sprite):
 
     def __init__(self) -> None:
         super().__init__(
             "assets/tiles.png",
-            image_y=3*16,
+            image_y=2*16,
             image_x=5*16,
             image_width=16,
             image_height=16,
-            scale=1.0
+            scale=SPRITE_SCALE
         )
         self.resource = Resource("water", amount=100, value=25)
+        self.textures = [
+            arcade.load_texture("assets/tiles.png", x=5*16, y=2*16,width=16,height=16),
+            arcade.load_texture("assets/tiles.png", x=5*16, y=3*16,width=16,height=16),
+            arcade.load_texture("assets/tiles.png", x=2*16, y=10*16,width=16,height=16),
+        ]
+        self.texture_stage = 0
+
+    def degrade(self) -> None:
+        if self.resource.amount > 0:
+            self.resource = Resource("water", amount=self.resource.amount/2, value=self.resource.value/2)
+            self.texture_stage += 1
+            if self.texture_stage >= len(self.textures):
+                self.texture_stage -= 1
+            self.texture = self.textures[self.texture_stage]
         
 
 class Tree(arcade.Sprite):
@@ -124,28 +158,47 @@ class Tree(arcade.Sprite):
             image_x=4*16,
             image_width=16,
             image_height=16,
-            scale=1.0
+            scale=SPRITE_SCALE
         )
         self.resource = Resource("wood", amount=20, value=10)
+        self.textures = [
+            arcade.load_texture("assets/tiles.png", x=4*16, y=9*16,width=16,height=16),
+            arcade.load_texture("assets/tiles.png", x=4*16, y=10*16,width=16,height=16),
+            arcade.load_texture("assets/tiles.png", x=2*16, y=8*16,width=16,height=16),
+        ]
+        self.texture_stage = 0
+
+    def degrade(self) -> None:
+        if self.resource.amount > 0:
+            self.resource = Resource("wood", amount=self.resource.amount/2, value=self.resource.value/2)
+            self.texture_stage += 1
+            if self.texture_stage >= len(self.textures):
+                self.texture_stage -= 1
+            self.texture = self.textures[self.texture_stage]
 
 
 class Player(arcade.Sprite):
 
-    def __init__(self) -> None:
+    def __init__(self, x, y) -> None:
         super().__init__(
-            "assets/tiles.png",
-            image_y=8*16,
-            image_x=6*16,
+            "assets/characters.png",
+            image_y=0*16,
+            image_x=7*16,
             image_width=16,
             image_height=16,
-            scale = 1.0
+            scale=SPRITE_SCALE
         )
         self.backpack = {
             "space": 50,
             "wood": 0,
             "water": 0,
-            "rock": 0 
+            "rock": 0,
+            "grass": 0
         }
+        self.delta_x = 0
+        self.delta_y = 0
+        self.true_x = x
+        self.true_y = y
         
 
     def gather(self, sprite):
@@ -167,3 +220,10 @@ class Player(arcade.Sprite):
         self.backpack["water"] = 0
         self.backpack["rock"] = 0
         self.backpack["space"] = 50
+
+    def update(self, *args):
+        self.center_x = (self.true_x // (16 * SPRITE_SCALE)) * 16 * SPRITE_SCALE
+        self.center_y = (self.true_y // (16 * SPRITE_SCALE)) * 16 * SPRITE_SCALE
+        self.true_x += self.delta_x
+        self.true_y += self.delta_y
+        super().update(*args)

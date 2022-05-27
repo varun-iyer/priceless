@@ -1,0 +1,1 @@
+SPRITE_SCALE = 4
