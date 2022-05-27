@@ -1,6 +1,7 @@
 from tkinter.font import names
 from typing import Type
 import arcade
+import arcade.gui
 import random
 import os
 import numpy as  np
@@ -16,7 +17,7 @@ class MenuView(arcade.View):
 
     def on_draw(self):
         self.clear()
-        arcade.draw_text("GAME NAME PLACEHOLDER", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+        arcade.draw_text("Priceless", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
                          arcade.color.WHITE, font_size=50, anchor_x="center")
         arcade.draw_text("Click to learn how to play", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 75,
                          arcade.color.GRAY, font_size=20, anchor_x="center")
@@ -26,14 +27,33 @@ class MenuView(arcade.View):
         self.window.show_view(instructions_view)
 
 class InstructionView(arcade.View):
+    # to test if a text label can show up
+    # def __init__(self):
+    #     super().__init__()
+    #     # Create a vertical BoxGroup to align buttons
+    #     self.v_box = arcade.gui.UIBoxLayout()
+    #     # Create a text label
+    #     ui_text_label = arcade.gui.UITextArea(text="This is a Text Widget",
+    #                                           width=450,
+    #                                           height=40,
+    #                                           font_size=24,
+    #                                           font_name="Kenney Future")
+
+    #     self.v_box.add(ui_text_label.with_space_around(top=0))
     def on_show_view(self):
         arcade.set_background_color(arcade.color.ORANGE_PEEL)
 
     def on_draw(self):
         self.clear()
-        arcade.draw_text("How to Play", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+        arcade.draw_text("How to Play", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 1.05 - 75,
                          arcade.color.BLACK, font_size=50, anchor_x="center")
-        arcade.draw_text("Objective: ", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 75, 
+        arcade.draw_text("Collect resources to expand your city and level up", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 1.25 - 75, 
+                        arcade.color.GRAY, font_size=20, anchor_x="center")
+        arcade.draw_text("Use the arrow keys to move across the board", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 1.35 - 75, 
+                        arcade.color.GRAY, font_size=20, anchor_x="center")
+        arcade.draw_text("Press Enter on a tile that has a resource to acquire it", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 1.45 - 75, 
+                        arcade.color.GRAY, font_size=20, anchor_x="center")
+        arcade.draw_text("Reach level 10 to beat the game", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 1.60 - 75, 
                         arcade.color.GRAY, font_size=20, anchor_x="center")
         arcade.draw_text("Click to advance", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2.5 - 75,
                          arcade.color.GRAY, font_size=20, anchor_x="center")
@@ -41,26 +61,7 @@ class InstructionView(arcade.View):
     def on_mouse_press(self, _x, _y, _button, _modifiers):
         game_view = Priceless()
         game_view.setup()
-        # arcade.close_window()
         self.window.show_view(game_view)
-
-# class CollectResourceView(arcade.View):
-#     def on_draw(self):
-#         """Draw the game overview"""
-#         self.clear()
-#         arcade.draw_text(
-#             "Click to Collect!",
-#             SCREEN_WIDTH / 2,
-#             SCREEN_HEIGHT / 2,
-#             arcade.color.WHITE,
-#             30,
-#             anchor_x="center",
-#         )
-
-#     def on_mouse_press(self, _x, _y, _button, _modifiers):
-#         """Use a mouse press to advance to the 'game' view."""
-#         game_view = Priceless()
-#         self.window.show_view(game_view)
 
 class Priceless(arcade.View):
     """ Main application class. """
@@ -69,7 +70,6 @@ class Priceless(arcade.View):
         """
         Initializer
         """
-        # super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, "Priceless")
         super().__init__()
 
         self.scene = None
@@ -81,6 +81,13 @@ class Priceless(arcade.View):
 
         # Set the background color
         arcade.set_background_color(arcade.color.AMAZON)
+
+        # # Create a text label
+        # ui_text_label = arcade.gui.UITextArea(text="This is a Text Widget",
+        #                                       width=450,
+        #                                       height=40,
+        #                                       font_size=24,
+        #                                       font_name="Kenney Future")
 
 
     def make_resource(self, x, y):
@@ -201,11 +208,8 @@ class Priceless(arcade.View):
 
 def main():
     """ Main function """
-    # window = Priceless(800, 800, "Priceless")
-    # # arcade.open_window(500, 500, "Welcome to GFG", False, False)
-    # window.setup()
 
-    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, "Different Views Example")
+    window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT, "")
     window.total_score = 0
     menu_view = MenuView()
     window.show_view(menu_view)
