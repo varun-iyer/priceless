@@ -43,36 +43,34 @@ class InstructionView(arcade.View):
 
     #     self.v_box.add(ui_text_label.with_space_around(top=0))
     def on_show_view(self):
-        arcade.set_background_color(arcade.color.ORANGE_PEEL)
+        pass
 
     def on_draw(self):
         self.clear()
         arcade.draw_text("How to Play", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 1.05 - 75,
-                         arcade.color.BLACK, font_size=50, anchor_x="center")
+                         arcade.color.WHITE, font_size=50, anchor_x="center")
         arcade.draw_text("Collect resources to expand your city and level up", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 1.25 - 75, 
                         arcade.color.GRAY, font_size=20, anchor_x="center")
         arcade.draw_text("Use the arrow keys to move across the board", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 1.35 - 75, 
                         arcade.color.GRAY, font_size=20, anchor_x="center")
         arcade.draw_text("Press Enter on a tile that has a resource to acquire it", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 1.45 - 75, 
                         arcade.color.GRAY, font_size=20, anchor_x="center")
-        arcade.draw_text("Reach level 10 to beat the game", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 1.60 - 75, 
-                        arcade.color.GRAY, font_size=20, anchor_x="center")
         arcade.draw_text("Click to advance", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2.5 - 75,
                          arcade.color.GRAY, font_size=20, anchor_x="center")
 
     def on_mouse_press(self, _x, _y, _button, _modifiers):
-        game_view = Priceless()
+        game_view = Priceless(self.window)
         game_view.setup()
         self.window.show_view(game_view)
 
 class Priceless(arcade.View):
     """ Main application class. """
 
-    def __init__(self):
+    def __init__(self, *args):
         """
         Initializer
         """
-        super().__init__()
+        super().__init__(*args)
 
         self.scene = None
         self.player_sprite = None
@@ -137,16 +135,18 @@ class Priceless(arcade.View):
         self.scene.add_sprite_list("Resources", use_spatial_hash=True)
 
 
-        for x in range(0, self.width-16 * SPRITE_SCALE, 16 * SPRITE_SCALE):
-            for y in range(0, self.height-16 * SPRITE_SCALE, 16 * SPRITE_SCALE):
+        for x in range(0, self.window.width-16 * SPRITE_SCALE, 16 * SPRITE_SCALE):
+            for y in range(0, self.window.height-16 * SPRITE_SCALE, 16 * SPRITE_SCALE):
                 # choose tile from enum
                 tile = self.get_random_resource()()
+                tile.center_x = x
+                tile.center_y = y
                 self.scene.add_sprite("Resources", tile)
 
         self.scene.add_sprite_list("City", use_spatial_hash=True)
 
         self.scene.add_sprite_list("Player", use_spatial_hash=True)
-        self.player_sprite = Player(self.width//2, self.height//2)
+        self.player_sprite = Player(self.window.width//2, self.window.height//2)
         self.scene.add_sprite("Player", self.player_sprite)
 
         self.city_manager = CityManager()
@@ -159,10 +159,10 @@ class Priceless(arcade.View):
         # This command has to happen before we start drawing
         self.clear()
 
+        self.scene.draw()
         arcade.draw_text("Resources", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 75,
                          arcade.color.GRAY, font_size=20, anchor_x="center")
 
-        self.scene.draw()
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed."""
